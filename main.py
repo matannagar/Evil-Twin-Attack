@@ -4,7 +4,7 @@ import sys
 # import codecs
 # import time
 from colorama import Fore, Style, Back
-# from scapy.all import sniff,sendp
+from scapy.all import get_if_list
 # from scapy.layers.dot11 import Dot11, Dot11Beacon, Dot11Elt, Dot11ProbeReq , Dot11ProbeResp, Dot11Deauth, RadioTap
 import logging
 
@@ -26,6 +26,9 @@ logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
 
 def attack():
+    
+    print(f"list of available interfaces:\n{get_if_list()}")
+    
     interface = wlan = input("\nEnter full interface name to set to Monitor Mode: \n "
                              "(The full address can be found via the terminal... run command 'pwconfig' and find the desired device) \n \n ")
 
