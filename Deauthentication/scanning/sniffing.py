@@ -96,7 +96,7 @@ def scanNetworks(interface):
     '''
     print("Press Ctrl-C to finish scanning for networks")
     # we arrange all of the networks we have found in known so that we will not print the network information twice on the terminal.
-    avilable_networks = {}
+    known = {}
 
     def callback(pkt):
         if pkt.haslayer(Dot11):  # is it a Wi-Fi packet? 802.11
@@ -104,7 +104,7 @@ def scanNetworks(interface):
             # The WLAN clients or stations use probe request frame to scan the area for availability of WLAN network.
             if pkt.haslayer(Dot11Beacon) or pkt.haslayer(Dot11ProbeResp):
                 src = pkt[Dot11].addr2  # src mac of sender
-                if src not in avilable_networks:  # if the network we found is not in 'known'
+                if src not in known:  # if the network we found is not in 'known'
                     ssid = pkt[Dot11Elt][0].info  # save the ssid
                     # save the channel of the network
                     channel = pkt[Dot11Elt][2].info
@@ -115,8 +115,8 @@ def scanNetworks(interface):
                     print("SSID: '{}', BSSID: {}, channel: {}".format(
                         ssid, src, channel))
                     # add the network to list
-                    avilable_networks[src] = (ssid, channel)
+                    known[src] = (ssid, channel)
 
     sniff(iface=interface, prn=callback, store=0)
 
-    return avilable_networks
+    return known
