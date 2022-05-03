@@ -15,7 +15,10 @@ def resetCounter():
     t(300,resetCounter).start()
     counter = 0 
 
-def countDeauthenticationPackages(pkt):
+def alert():
+    os.system("play -nq -t alsa synth 1 sine 440")
+    
+def countDeauthenticationPackages(pkt):    
     
     global counter
     counter+=1
@@ -24,8 +27,8 @@ def countDeauthenticationPackages(pkt):
             if pkt.subtype == 12:
                 counter+=1
     
-    if(counter > 100):
-        os.system('notify-send "ERROR" "error"')
+    if(counter == 100):
+        alert()
         print("warning!")
 
 if __name__=='__main__':
