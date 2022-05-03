@@ -94,7 +94,6 @@ def scanNetworks(interface):
     For each packet, extracts the AP information SSID, BBSID, channel.
     @param interface - name of the monitor card
     '''
-    print("Press Ctrl-C to finish scanning for networks")
     # we arrange all of the networks we have found in known so that we will not print the network information twice on the terminal.
     known = {}
 
