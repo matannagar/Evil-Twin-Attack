@@ -61,8 +61,6 @@ def getClients(pkt):
     Based on:
     https://www.youtube.com/watch?v=owsr3X453Z4&ab_channel=PentesterAcademyTV
     '''
-    global voc
-    voc = {}  # vocabulary for all the pkt info
     bssid = pkt[Dot11].addr3
     target_bssid = a
     if target_bssid == bssid and not pkt.haslayer(Dot11Beacon) and not pkt.haslayer(Dot11ProbeReq) and not pkt.haslayer(Dot11ProbeResp):
@@ -76,6 +74,8 @@ def sniffClients(interface, BSSID):
     @param interface - the given monitor card we are using for sniffing
     @param BSSID - given Acess Point ID.
     '''
+    global voc
+    voc = {}
     global a
     a = BSSID
     interupted = False

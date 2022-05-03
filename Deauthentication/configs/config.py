@@ -4,6 +4,8 @@ import os
 def setMonitorMode(wlan):
     """Gets from the user the full interface name to set to Monitor Mode and sets him.
     @param wlan: The wlan address"""
+    print("\nSetting" + wlan + "to monitor mode!")
+    
     os.system("sudo ip link set " + wlan + " down")
     os.system("sudo iw " + wlan + " set type monitor")
     os.system("sudo ip link set " + wlan + " up")
@@ -28,5 +30,7 @@ def setManagerMode(wlan):
     """Changing the interface back to managed mode.
     @param wlan: wlan address"""
     os.system("sudo ip link set " + wlan + " down")
-    os.system("sudo iw wlan0 set type managed")
+    os.system("sudo iw  "+ wlan + " set type managed")
     os.system("sudo ip link set " + wlan + " up")
+    
+    print("\n"+wlan + " is set back to managed mode")
