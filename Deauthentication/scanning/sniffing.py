@@ -78,14 +78,15 @@ def getClients(pkt):
     Based on:
     https://www.youtube.com/watch?v=owsr3X453Z4&ab_channel=PentesterAcademyTV
     '''
-    bssid = pkt[Dot11].addr3
-    target_bssid = a
-    #if target_bssid == bssid and not pkt.haslayer(Dot11Beacon) and not pkt.haslayer(Dot11ProbeReq) and not pkt.haslayer(Dot11ProbeResp):
-        #if pkt.addr1 not in voc:
-    if (pkt.addr2 == target_bssid or pkt.addr3 == target_bssid) and pkt.addr1 != "ff:ff:ff:ff:ff:ff":
-        if pkt.addr1 not in voc and pkt.addr2 != pkt.addr1 and pkt.addr1 != pkt.addr3 and pkt.addr1:
-            print(pkt.addr1)
-            voc.append(pkt.addr1)
+    if pkt.haslayer(Dot11): 
+        bssid = pkt[Dot11].addr3
+        target_bssid = a
+        #if target_bssid == bssid and not pkt.haslayer(Dot11Beacon) and not pkt.haslayer(Dot11ProbeReq) and not pkt.haslayer(Dot11ProbeResp):
+            #if pkt.addr1 not in voc:
+        if (pkt.addr2 == target_bssid or pkt.addr3 == target_bssid) and pkt.addr1 != "ff:ff:ff:ff:ff:ff":
+            if pkt.addr1 not in voc and pkt.addr2 != pkt.addr1 and pkt.addr1 != pkt.addr3 and pkt.addr1:
+                print(pkt.addr1)
+                voc.append(pkt.addr1)
 
 
 def sniffClients(interface, BSSID):
@@ -99,7 +100,7 @@ def sniffClients(interface, BSSID):
     a = BSSID
     interupted = False
     try:
-        sniff(iface=interface, prn=getClients, timeout=30)
+        sniff(iface=interface, prn=getClients, stop_filter=interupted)
     except KeyboardInterrupt:
         interupted = True
 
@@ -136,7 +137,7 @@ def scanNetworks(interface):
     print('networks:')
     print('*********')
     try:
-        sniff(prn=callback, iface=interface, timeout=15)
+        sniff(prn=callback, iface=interface)
     except UnicodeDecodeError as e:
         print('Exception: in function {}'.format("f"), e)
     channel_thread.join()  # waiting for channel switching to end
