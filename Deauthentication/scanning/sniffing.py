@@ -1,7 +1,10 @@
 from scapy.all import sniff
-from scapy.layers.dot11 import Dot11, Dot11Beacon, Dot11Elt, Dot11ProbeReq, Dot11ProbeResp
+from scapy.layers.dot11 import Dot11, Dot11Beacon, Dot11Elt, Dot11ProbeReq, Dot11ProbeResp,RadioTap
 import time
 import codecs
+from datetime import datetime
+import os
+from threading import Thread
 
 '''
 Wireless LAN is a network where devices are using wireless to communicate with each other in a defined area.
@@ -53,6 +56,20 @@ How to get SSID list?
 Detect beacon frames, access the 802.11 frame -> SSID parameter 
 '''
 
+def switch_channel(interface: str, timeout_seconds, channel: int = 1):
+    """
+    This function changing the channel searching. (to identify networks and clients that uses other channels)
+    :param timeout_seconds: function timeout
+    :param interface: the interface that used to identify the networks / clients. (wlan0 for example)
+    :param channel: the starting channel default is 1.
+    """
+    start_time = datetime.now()
+    channel = channel
+    while (datetime.now() - start_time).seconds < timeout_seconds:
+        channel = (channel % 14) + 1
+        os.system('iwconfig {} channel {}'.format(interface, channel))
+        time.sleep(1)
+
 
 def getClients(pkt):
     '''Identifies beacon packets and extracts the name and BSSID address
@@ -61,12 +78,15 @@ def getClients(pkt):
     Based on:
     https://www.youtube.com/watch?v=owsr3X453Z4&ab_channel=PentesterAcademyTV
     '''
-    bssid = pkt[Dot11].addr3
-    target_bssid = a
-    if target_bssid == bssid and not pkt.haslayer(Dot11Beacon) and not pkt.haslayer(Dot11ProbeReq) and not pkt.haslayer(Dot11ProbeResp):
-        if str(pkt.summary()) not in voc:
-            print(pkt.summary())
-        voc[str(pkt.summary())] = True
+    if pkt.haslayer(Dot11): 
+        bssid = pkt[Dot11].addr3
+        target_bssid = a
+        #if target_bssid == bssid and not pkt.haslayer(Dot11Beacon) and not pkt.haslayer(Dot11ProbeReq) and not pkt.haslayer(Dot11ProbeResp):
+            #if pkt.addr1 not in voc:
+        if (pkt.addr2 == target_bssid or pkt.addr3 == target_bssid) and pkt.addr1 != "ff:ff:ff:ff:ff:ff":
+            if pkt.addr1 not in voc and pkt.addr2 != pkt.addr1 and pkt.addr1 != pkt.addr3 and pkt.addr1:
+                print(pkt.addr1)
+                voc.append(pkt.addr1)
 
 
 def sniffClients(interface, BSSID):
@@ -75,14 +95,12 @@ def sniffClients(interface, BSSID):
     @param BSSID - given Acess Point ID.
     '''
     global voc
-    voc = {}
+    voc = []
     global a
     a = BSSID
     interupted = False
     try:
         sniff(iface=interface, prn=getClients, stop_filter=interupted)
-        while True:
-            time.sleep(1)
     except KeyboardInterrupt:
         interupted = True
 
@@ -104,18 +122,24 @@ def scanNetworks(interface):
             if pkt.haslayer(Dot11Beacon) or pkt.haslayer(Dot11ProbeResp):
                 src = pkt[Dot11].addr2  # src mac of sender
                 if src not in known:  # if the network we found is not in 'known'
-                    ssid = pkt[Dot11Elt][0].info  # save the ssid
+                    ssid = pkt[Dot11Elt][0].info.decode()  # save the ssid
                     # save the channel of the network
-                    channel = pkt[Dot11Elt][2].info
-                    # transfer it to hex numbers.
-                    print(channel)
-                    channel = int(codecs.getencoder('hex')(channel)[0], 16)
+                    channel = pkt[RadioTap].channel
                     # print the network information.
                     print("SSID: '{}', BSSID: {}, channel: {}".format(
                         ssid, src, channel))
                     # add the network to list
                     known[src] = (ssid, channel)
 
-    sniff(iface=interface, prn=callback, store=0)
+    channel_thread = Thread(target=switch_channel, args=(interface, 15), daemon=True)
+    channel_thread.start()
+    print('*********')
+    print('networks:')
+    print('*********')
+    try:
+        sniff(prn=callback, iface=interface)
+    except UnicodeDecodeError as e:
+        print('Exception: in function {}'.format("f"), e)
+    channel_thread.join()  # waiting for channel switching to end
 
     return known
