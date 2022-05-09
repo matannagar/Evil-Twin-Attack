@@ -15,8 +15,11 @@ def resetCounter():
     t(300,resetCounter).start()
     counter = 0 
 
-def alert():
+def alert_sound():
     os.system("play -nq -t alsa synth 1 sine 440")
+def alert():
+    os.system("notify-send '--icon=error' 'you are under attack'")
+    
     
 def countDeauthenticationPackages(pkt):    
     
@@ -30,6 +33,7 @@ def countDeauthenticationPackages(pkt):
     if(counter == 100):
         alert()
         print("warning!")
+        alert_sound()
 
 if __name__=='__main__':
     
