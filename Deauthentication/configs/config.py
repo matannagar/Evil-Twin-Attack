@@ -12,6 +12,6 @@ def setMonitorMode(wlan):
 def setManagerMode(wlan):
     """Changing the interface back to managed mode.
     @param wlan: wlan address"""
-    #os.system("sudo ip link set " + wlan + " down")
-    #os.system("sudo iw  "+ wlan + " set type managed")
+    os.system("sudo ip link set " + wlan + " down")
+    os.system("sudo iw  "+ wlan + " set type managed")
     os.system('ifconfig ' + wlan + ' up')

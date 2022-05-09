@@ -136,10 +136,7 @@ def scanNetworks(interface):
     print('*********')
     print('networks:')
     print('*********')
-    try:
-        sniff(prn=callback, iface=interface)
-    except UnicodeDecodeError as e:
-        print('Exception: in function {}'.format("f"), e)
+    sniff(prn=callback, iface=interface)
     channel_thread.join()  # waiting for channel switching to end
 
     return known
