@@ -1,60 +1,11 @@
 from scapy.all import sniff
-from scapy.layers.dot11 import Dot11, Dot11Beacon, Dot11Elt, Dot11ProbeReq, Dot11ProbeResp,RadioTap
+from scapy.layers.dot11 import Dot11, Dot11Beacon, Dot11Elt, Dot11ProbeReq, Dot11ProbeResp, RadioTap
 import time
 import codecs
 from datetime import datetime
 import os
 from threading import Thread
 
-'''
-Wireless LAN is a network where devices are using wireless to communicate with each other in a defined area.
-Wireless LAN is ultimately connected to a wired network. 
-
-WAP - wireless access point - a device that accepts wireless signals from multiple devices and retransmits them to the rest of the network.
-AP - access point is layer 2 device because it is like a bridge connecting 2 types of networks, wireless and wired.
-These two networks are not seperate, they belong to one broadcast domain.
-In other word, they belong to one local area network.
-
-802.11 - Wi-Fi - 
-* designed for use in a limited geographical area
-* 
-
-Frames - 
-
-MAC addresses - 
-
-AP broadcast - by default, an AP brodcats its SSID in its service area
-
-BSS - basic service set - is a group of wireless network devices that are working with the same AP
-
-BSSID is a unique identifier used by a client to establish a connection to a particular wireless network.
-It is the phsyical or MAC address which is 48-bit long hexadecimal numbers.
-As a wireless user we cannot see BSSID, but they are included in the packages. 
-
-SSID is the name of a WiFi network that acts as a single shared password between access points and clients.
-
-An AP can provide multiple SSIDs on the same channel through the use of the same or multiple interfaces.
-
-Dot11 is a fast, secure and reliable Wi-Fi service which delivers seamless, building-wide network connectivity in an increasing number of London building centres.
-dot11 = 802.11 specification
-
-Dot11Beacon Frame - Beacon frame is one of the management frames in IEEE 802.11 based WLANs. It contains all the information about the network. 
-Beacon frames are transmitted periodically, they serve to announce the presence of a wireless LAN and to synchronise the members of the service set.
-
-Dot11Elt
-
-Dot11ProbeReq
-
-Dot11ProbeResp
-
-addr1	Destination MAC address.
-addr2	Source MAC address of sender.
-addr3	MAC address of Access Point.
-
-
-How to get SSID list?
-Detect beacon frames, access the 802.11 frame -> SSID parameter 
-'''
 
 def switch_channel(interface: str, timeout_seconds, channel: int = 1):
     """
@@ -78,11 +29,11 @@ def getClients(pkt):
     Based on:
     https://www.youtube.com/watch?v=owsr3X453Z4&ab_channel=PentesterAcademyTV
     '''
-    if pkt.haslayer(Dot11): 
+    if pkt.haslayer(Dot11):
         bssid = pkt[Dot11].addr3
         target_bssid = a
-        #if target_bssid == bssid and not pkt.haslayer(Dot11Beacon) and not pkt.haslayer(Dot11ProbeReq) and not pkt.haslayer(Dot11ProbeResp):
-            #if pkt.addr1 not in voc:
+        # if target_bssid == bssid and not pkt.haslayer(Dot11Beacon) and not pkt.haslayer(Dot11ProbeReq) and not pkt.haslayer(Dot11ProbeResp):
+        # if pkt.addr1 not in voc:
         if (pkt.addr2 == target_bssid or pkt.addr3 == target_bssid) and pkt.addr1 != "ff:ff:ff:ff:ff:ff":
             if pkt.addr1 not in voc and pkt.addr2 != pkt.addr1 and pkt.addr1 != pkt.addr3 and pkt.addr1:
                 print(pkt.addr1)
@@ -131,7 +82,8 @@ def scanNetworks(interface):
                     # add the network to list
                     known[src] = (ssid, channel)
 
-    channel_thread = Thread(target=switch_channel, args=(interface, 15), daemon=True)
+    channel_thread = Thread(target=switch_channel,
+                            args=(interface, 15), daemon=True)
     channel_thread.start()
     print('*********')
     print('networks:')
