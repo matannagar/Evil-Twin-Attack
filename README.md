@@ -1,6 +1,4 @@
 # Evil Twin Attack
-![ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)  
-![python](https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue)
 
 An evil twin attack is a spoofing cyberattack that works by tricking users into connecting to a fake  
 Wi-Fi access point that mimics a legitimate network.  
