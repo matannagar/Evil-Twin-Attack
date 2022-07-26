@@ -29,11 +29,9 @@ def getClients(pkt):
     Based on:
     https://www.youtube.com/watch?v=owsr3X453Z4&ab_channel=PentesterAcademyTV
     '''
-    if pkt.haslayer(Dot11):
+    if pkt.haslayer(Dot11):  # is it a Wi-Fi packet? 802.11
         bssid = pkt[Dot11].addr3
         target_bssid = a
-        # if target_bssid == bssid and not pkt.haslayer(Dot11Beacon) and not pkt.haslayer(Dot11ProbeReq) and not pkt.haslayer(Dot11ProbeResp):
-        # if pkt.addr1 not in voc:
         if (pkt.addr2 == target_bssid or pkt.addr3 == target_bssid) and pkt.addr1 != "ff:ff:ff:ff:ff:ff":
             if pkt.addr1 not in voc and pkt.addr2 != pkt.addr1 and pkt.addr1 != pkt.addr3 and pkt.addr1:
                 print(pkt.addr1)
@@ -74,9 +72,14 @@ def scanNetworks(interface):
                 src = pkt[Dot11].addr2  # src mac of sender
                 if src not in known:  # if the network we found is not in 'known'
                     ssid = pkt[Dot11Elt][0].info.decode()  # save the ssid
-                    # save the channel of the network
+
+                    '''save the channel of the network supplied by the radiotap header (which offer additional information that is added
+                    to each 802.11 frame when capturing frame. Radiotaps are not part of standard 802.11 frames.)'''
                     channel = pkt[RadioTap].channel
-                    # print the network information.
+
+                    ''' prints the networks information.
+                    The BSSID uniquely identifies the access point's radio using a MAC address, 
+                    while the SSID is the name of the network that allows devices to connect.'''
                     print("SSID: '{}', BSSID: {}, channel: {}".format(
                         ssid, src, channel))
                     # add the network to list
