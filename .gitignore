@@ -1,6 +1,8 @@
 /venv/
 /.idea/
+.idea/
 /__pycache__/
+__pycache__/
 /create_fake_ap.cpython-39.pyc/
 /password_handler.cpython-39.pyc/
 /FakeAccessPoint/__pycache__/create_fake_ap.cpython-39.pyc/
