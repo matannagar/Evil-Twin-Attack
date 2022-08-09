@@ -68,8 +68,9 @@ def scanNetworks(interface):
         if pkt.haslayer(Dot11):  # is it a Wi-Fi packet? 802.11
             # Beacon frame is one of the management frames in IEEE 802.11 based WLANs. It contains all the information about the network.
             # The WLAN clients or stations use probe request frame to scan the area for availability of WLAN network.
+            # we should ask if pkt.type == 0 and (pkt.subtype == 8 or pkt.subtype == 5)
             if pkt.haslayer(Dot11Beacon) or pkt.haslayer(Dot11ProbeResp):
-                src = pkt[Dot11].addr2  # src mac of sender
+                src = pkt[Dot11].addr2  # src mac of transmitter 
                 if src not in known:  # if the network we found is not in 'known'
                     ssid = pkt[Dot11Elt][0].info.decode()  # save the ssid
 
@@ -86,12 +87,12 @@ def scanNetworks(interface):
                     known[src] = (ssid, channel)
 
     channel_thread = Thread(target=switch_channel,
-                            args=(interface, 15), daemon=True)
+                            args=(interface, 60), daemon=True)
     channel_thread.start()
     print('*********')
     print('networks:')
     print('*********')
-    sniff(prn=callback, iface=interface)
+    sniff(prn=callback, iface=interface) # timeout=60
     channel_thread.join()  # waiting for channel switching to end
 
     return known
