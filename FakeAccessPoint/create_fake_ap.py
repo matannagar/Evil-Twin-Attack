@@ -33,9 +33,10 @@ def create_config_files(SSID,interface):
         f.write("interface="+interface+"\n")
         f.write("bind-interfaces\n")
         f.write("dhcp-range=10.0.0.10,10.0.0.100,8h\n")
-        f.write("dhcp-option=3,10.0.0.1\n")
-        f.write("dhcp-option=6,10.0.0.1\n")
-        f.write("address=/#/10.0.0.1\n")
+        f.write("dhcp-option=3,10.0.0.1\n") #Set the gateway IP address
+        f.write("dhcp-option=6,10.0.0.1\n") #Set dns server address
+        f.write("address=/#/10.0.0.1\n") #Redirect all requests to 10.0.0.1
+
     
 
     
