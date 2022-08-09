@@ -23,7 +23,7 @@ def switch_channel(interface: str, timeout_seconds, channel: int = 1):
 
 
 def getClients(pkt):
-    '''Identifies beacon packets and extracts the name and BSSID address
+    '''Identifies packets and extracts the MAC address of the client
     @param pkt: captured packet
 
     Based on:
