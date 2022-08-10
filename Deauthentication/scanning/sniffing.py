@@ -30,8 +30,8 @@ def getClients(pkt):
     https://www.youtube.com/watch?v=owsr3X453Z4&ab_channel=PentesterAcademyTV
     '''
     if pkt.haslayer(Dot11):  # is it a Wi-Fi packet? 802.11
-        bssid = pkt[Dot11].addr3
-        target_bssid = a
+        bssid = pkt[Dot11].addr3 # client MAC address
+        target_bssid = a # network MAC address
         if (pkt.addr2 == target_bssid or pkt.addr3 == target_bssid) and pkt.addr1 != "ff:ff:ff:ff:ff:ff":
             if pkt.addr1 not in voc and pkt.addr2 != pkt.addr1 and pkt.addr1 != pkt.addr3 and pkt.addr1:
                 print(pkt.addr1)
